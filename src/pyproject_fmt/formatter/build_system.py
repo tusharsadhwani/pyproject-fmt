@@ -11,11 +11,23 @@ from .util import order_keys, sorted_array
 
 
 def fmt_build_system(parsed: TOMLDocument, conf: Config) -> None:
-    system = cast(Optional[Table], parsed.get("build-system"))
-    if system is not None:
-        normalize_pep508_array(cast(Optional[Array], system.get("requires")), conf.indent)
-        sorted_array(cast(Optional[Array], system.get("backend-path")), indent=conf.indent)
-        order_keys(system, ("build-backend", "requires", "backend-path"))
+    system = parsed.get("build-system")
+    if system is None:
+        return
+
+    assert isinstance(system, Table)
+
+    requires = system.get("requires")
+    if requires is not None:
+        assert isinstance(requires, Array)
+        normalize_pep508_array(requires, conf.indent)
+
+    backend_path = system.get("backend-path")
+    if backend_path is not None:
+        assert isinstance(backend_path, Array)
+        sorted_array(backend_path, conf.indent)
+
+    order_keys(system, ("build-backend", "requires", "backend-path"))
 
 
 __all__ = [

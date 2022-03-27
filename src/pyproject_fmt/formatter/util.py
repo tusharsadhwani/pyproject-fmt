@@ -61,11 +61,7 @@ class ArrayEntries:
     comments: list[Comment] = field(default_factory=list)
 
 
-def sorted_array(
-    array: Array | None, indent: int, key: Callable[[ArrayEntries], str] = lambda e: str(e.text).lower()
-) -> None:
-    if array is None:
-        return
+def sorted_array(array: Array, indent: int, key: Callable[[ArrayEntries], str] = lambda e: str(e.text).lower()) -> None:
     body = array._value
 
     entries: list[ArrayEntries] = []

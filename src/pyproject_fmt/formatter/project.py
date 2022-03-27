@@ -11,9 +11,11 @@ from .util import order_keys, sorted_array
 
 
 def fmt_project(parsed: TOMLDocument, conf: Config) -> None:
-    project = cast(Optional[Table], parsed.get("project"))
+    project = parsed.get("project")
     if project is None:
         return
+
+    assert isinstance(project, Table)
 
     if "name" in project:  # normalize names to underscore so sdist / wheel have the same prefix
         name = project["name"]
@@ -22,8 +24,15 @@ def fmt_project(parsed: TOMLDocument, conf: Config) -> None:
     if "description" in project:
         project["description"] = String.from_raw(str(project["description"]).strip())
 
-    sorted_array(cast(Optional[Array], project.get("keywords")), indent=conf.indent)
-    sorted_array(cast(Optional[Array], project.get("dynamic")), indent=conf.indent)
+    keywords = project.get("keywords")
+    if keywords is not None:
+        assert isinstance(keywords, Array)
+        sorted_array(keywords, conf.indent)
+    dynamic = project.get("dynamic")
+
+    if dynamic is not None:
+        assert isinstance(dynamic, Array)
+        sorted_array(dynamic, conf.indent)
 
     normalize_pep508_array(cast(Optional[Array], project.get("dependencies")), conf.indent)
     if "optional-dependencies" in project:
